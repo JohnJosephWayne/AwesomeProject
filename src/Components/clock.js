@@ -4,10 +4,10 @@ import {
 } from "react";
 
 
-function Clock({currentText}) {
+function Clock({currentTime}) {
     
     return (
-      <Text style={{textAlign:"center", marginTop:15, marginBottom:10}} >{currentText}</Text>
+      <Text style={{textAlign:"center", marginTop:15, marginBottom:10}} >{currentTime}</Text>
     )
   }
 

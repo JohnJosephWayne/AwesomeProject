@@ -1,31 +1,25 @@
-import { 
-  React,
-  useEffect,
-  useState
-} from "react";
-import{
-  Button, 
-  StyleSheet,
-  View
-} from "react-native";
+import React, { useState, useEffect } from 'react';
+import { Button, View } from 'react-native';
 
-import Clock from "./clock";
-
+import Clock from './Clock';
 
 function UseState() {
-  const [currentText, setCurrentText] = useState(new Date().toLocaleTimeString());
-  
-  function handlePress() {
-    setCurrentText(new Date().toLocaleTimeString());
-  }
-  
+  const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date().toLocaleTimeString());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
   return (
     <View>
-      <Clock currentText={setCurrentText} />
-      <Button title="Actualiser l'heure" onPress={currentText}/>
+      <Clock currentTime={currentTime} />
+      {/* <Button title="Actualiser l'heure" onPress={() => setCurrentTime(new Date().toLocaleTimeString())} /> */}
     </View>
   );
 }
 
 export default UseState;
-
