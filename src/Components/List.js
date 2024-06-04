@@ -52,7 +52,7 @@ function App() {
   const deleteSites = async () => {
     if (listItems !== null){
       try {
-        await AsyncStorage.removeItem('listItems').then(() => {
+        await AsyncStorage.clear('listItems').then(() => {
           setList([]);
         })
     }
