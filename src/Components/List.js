@@ -1,137 +1,148 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { View, Text, TextInput, Button, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import ListHeader from './ListHeader';
+import ListFooter from './ListFooter';
 
-function App() {
-  const [siteName, setSiteName] = useState('');
-  const [siteUrl, setSiteUrl] = useState('');
-  const [listItems, setList] = useState([
-  
-  ]);
+const List = ({navigation}) => {
+    const [itemAjouter, setItemAjouter] = useState('');
+    const [items, setItems] = useState(["Item 1", "Item 2"]);
 
-  useEffect(() => {
-    loadListFromStorage();
-  }, []);
+    useEffect(() => {
+        chargerListe();
+    }, []);
 
-  useEffect(() => {
-      saveListToStorage(listItems);
-  }, [listItems]);
+    useEffect(() => {
+        if (items.length === 0) {
+            navigation.navigate('DefaultPage');
+        }
+    }, [items]);
 
-  const loadListFromStorage = async () => {
-    try {
-      const storedList = await AsyncStorage.getItem('listItems');
-
-      setList(JSON.parse(storedList));
-    } catch (error) {
-      console.error('Erreur lors du chargement depuis AsyncStorage :', error);
-    }
-  };
-
-  const saveListToStorage = async (storedList) => {
-    try {
-      await AsyncStorage.setItem('listItems', JSON.stringify(storedList));
-    } catch (error) {
-      console.error('Erreur lors de l\'enregistrement dans AsyncStorage :', error);
-    }
-  };
-
-  const handleAddSite = () => {
-    if (!siteName || !siteUrl) return;
-
-    const newSite = {
-      name: siteName,
-      url: siteUrl,
+    const ajoutItem = () => {
+        if (itemAjouter.trim()) {
+            const newItems = [...items, itemAjouter];
+            setItems(newItems);
+            setItemAjouter('');
+            enregistrerItems(newItems);
+        }
     };
 
-    setList([...listItems, newSite]);
+    const chargerListe = async () => {
+        try {
+            const storedItems = await AsyncStorage.getItem('items');
+            if (storedItems) {
+                setItems(JSON.parse(storedItems));
+            }
+        } catch (error) {
+            console.error('Erreur lors du chargement des items :', error);
+        }
+    };
 
-    setSiteUrl('');
-    setSiteName('');
-  };
+    const enregistrerItems = async (newItems) => {
+        try {
+            await AsyncStorage.setItem('items', JSON.stringify(newItems));
+        } catch (error) {
+            console.error('Erreur lors de la sauvegarde des éléments :', error);
+        }
+    };
 
-  const deleteSites = async () => {
-    if (listItems !== null){
-      try {
-        await AsyncStorage.clear('listItems').then(() => {
-          setList([]);
-        })
-    }
-    catch (exception) {
-        return false;
-    }
+    const supprimerItem = (index) => {
+        const newItems = items.filter((_, i) => i !== index);
+        setItems(newItems);
+        enregistrerItems(newItems);
+    };
 
-    }
-  }
-
-  return (
-    <View>
-      <TextInput
-        style={styles.input}
-        placeholder="Nom de site"
-        value={siteName}
-        onChangeText={text => setSiteName(text)}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="URL"
-        value={siteUrl}
-        onChangeText={text => setSiteUrl(text)}
-      />
-      <Button style={styles.clic} title="Ajouter" onPress={handleAddSite} />
-
-      <Button style={styles.clic} title="Supprimer" onPress={deleteSites} />
-
-      <View style={styles.sectionContainer}>
-        
-        {listItems != null && listItems.map((item, i) => (
-          <View style={styles.item} key={i}>
-            <Text style={styles.itemText}>
-              {item.name}
-            </Text>
-            <Text style={styles.itemText}>
-              {item.url}
-            </Text>
-          </View>
-        ))}
-      </View>
-    </View>
-  );
-}
+    return (
+        <View style={styles.container}>
+            <ListHeader />
+            <TextInput
+                placeholder="Saisir un élément"
+                value={itemAjouter}
+                onChangeText={setItemAjouter}
+                style={styles.input}
+            />
+            <TouchableOpacity onPress={ajoutItem} style={styles.ajoutButton}>
+                <Text style={styles.ajoutButtonText}>Ajouter</Text>
+            </TouchableOpacity>
+            <FlatList
+                data={items}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={({ item, index }) => (
+                    <View style={styles.itemContainer}>
+                        <Text style={styles.liste}>{item}</Text>
+                        <TouchableOpacity onPress={() => supprimerItem(index)} style={styles.deleteButton}>
+                            <Text style={styles.deleteButtonText}>Supprimer</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => navigation.navigate('Details', {item})} style={styles.voirPlusButton}>
+                            <Text style={styles.deleteButtonText}>Voir plus</Text>
+                        </TouchableOpacity>
+                    </View>
+                )}
+            />
+            <ListFooter />
+        </View>
+    );
+};
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-    textAlign: "center",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  item: {
-    fontSize: 24,
-    backgroundColor: '#080B21',
-    marginTop: 20,
-    marginEnd: 20,
-    padding: 10,
-    borderRadius: 16,
-    width: 160,
-  },
-  itemText: {
-    color: "#C5E7E2",
-  },
-  input: {
-    borderColor: "#000",
-    borderWidth: 1,
-    padding: 5,
-    marginTop: 5,
-    marginBottom: 10,
-  },
-  clic: {
-    padding: 5,
-    marginTop: 5,
-    marginBottom: 10,
-  }
+    container: {
+        flex: 1,
+        backgroundColor: '#E6D0E6',
+    },
+    title: {
+        fontSize: 24,
+        color: '#340834',
+        marginBottom: 10,
+        textAlign: 'center',
+    },
+    input: {
+        borderWidth: 1,
+        borderColor: '#B06CB0',
+        borderRadius: 5,
+        padding: 10,
+        marginBottom: 10,
+        color: '#340834',
+    },
+    liste: {
+        fontSize: 18,
+        color: '#340834',
+        padding: 10,
+    },
+    itemContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderBottomWidth: 1,
+        borderBottomColor: '#B06CB0',
+        paddingVertical: 10,
+    },
+    ajoutButton: {
+        backgroundColor: "#B06CB0",
+        padding: 7,
+        borderRadius: 5,
+        marginHorizontal: 25,
+    },
+    ajoutButtonText: {
+        color: "#e2f6c3",
+        fontSize: 18,
+        fontWeight: 'semi-bold',
+        textAlign: 'center',
+    },
+    deleteButton: {
+        backgroundColor: '#cdef97',
+        padding: 5,
+        borderRadius: 5,
+        marginLeft: 10,
+    },
+    deleteButtonText: {
+        color: '#340834',
+        fontSize: 12,
+    },
+    voirPlusButton: {
+        backgroundColor: "#e597ef",
+        padding: 5,
+        borderRadius: 5,
+        marginLeft: 10,
+    }
 });
 
-export default App;
+export default List;
