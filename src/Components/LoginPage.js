@@ -25,7 +25,7 @@ const LoginPage = ({ navigation }) => {
             if (response.status === 200) {
                 const data = await response.json();
                 await AsyncStorage.setItem('userToken', data.token);
-                navigation.navigate('Liste'); // Naviguer vers la page d'accueil ou une autre page
+                navigation.navigate('Home'); // Naviguer vers la page d'accueil 
             } else {
                 console.log(response);
                 Alert.alert('Erreur', 'Email ou mot de passe incorrect.');

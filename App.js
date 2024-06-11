@@ -12,14 +12,20 @@ const App = () => {
 
   const Stack = createNativeStackNavigator();
 
+  useEffect(() => {
+    if (!handleLogin()) {
+      navigation.navigate('LoginPage');
+    }
+  }, [navigation]);
+  
   return (
 
     <NavigationContainer>
         <Stack.Navigator>
-        <Stack.Screen name="LoginPage" component={LoginPage} options= {{headerShown: false}} />
-        <Stack.Screen name="Liste" component={List} options= {{headerShown: false}}/>
-        <Stack.Screen name="Details" component={Details} options= {{headerShown: false}}/>
-        <Stack.Screen name="DefaultPage" component={HomeScreen} options= {{headerShown: false}} />
+          <Stack.Screen name="LoginPage" component={LoginPage} options= {{headerShown: false}} />
+          <Stack.Screen name="Home" component={HomeScreen} options= {{headerShown: false}} />
+          <Stack.Screen name="Liste" component={List} options= {{headerShown: false}}/>
+          <Stack.Screen name="Details" component={Details} options= {{headerShown: false}}/>
         </Stack.Navigator>
     </NavigationContainer>
 

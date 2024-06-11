@@ -14,7 +14,7 @@ const List = ({navigation}) => {
 
     useEffect(() => {
         if (items.length === 0) {
-            navigation.navigate('DefaultPage');
+            navigation.navigate('Home');
         }
     }, [items]);
 

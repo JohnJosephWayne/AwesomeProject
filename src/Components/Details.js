@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import ListHeader from './ListHeader';
 import ListFooter from './ListFooter';
 
-const Details = ({ route, navigation}) => {
+const Details = ({ route, navigation }) => {
 
     const {item} = route.params;
     return(
